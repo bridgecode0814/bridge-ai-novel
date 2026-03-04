@@ -2720,7 +2720,11 @@ function hideLoadOverlay(){
 
 // 암호화된 API 키 (XOR + base64, 입장 코드로만 복호화 가능)
 // 원본 키는 소스에 없음 — 입장 코드 없이는 사용 불가
+// ── 암호화된 자격증명 (입장 코드로만 복호화 가능) ──
 const _EK = "ERlEBQkRH1FCXFJBRCMjHwt/RlMOMTErPjMDZFBWADkqLQUOCgNjUDIkIkk0F39UWn9RIjslHigCfVkDCgdfHC8jWHICdAhDPD0dA3ZDUQw4OBMcHxJRZUZUBAoKHCMBSwRjGAQgAlA/EnNx";
+// GitHub PAT — rotate_code.py로 생성 후 여기에 붙여넣기
+// 비어있으면 GitHub 자동 연결 안 함 (수동 연결은 가능)
+const _GT = "BRoZOx8Delp0AwAEIzMtLgADCgQtGz4VJFFcYXtaWyBYLVcGdGUCQQ=="; // GitHub PAT (암호화)
 
 function _xd(enc, key){
   try {
@@ -2730,8 +2734,12 @@ function _xd(enc, key){
 }
 
 function _validateKey(key){
-  // Claude API 키 형식 검증
   return key.startsWith('sk-ant-') && key.length > 50;
+}
+
+function _validateGHToken(token){
+  // GitHub PAT: ghp_ 또는 github_pat_ 로 시작
+  return (token.startsWith('ghp_') || token.startsWith('github_pat_')) && token.length > 20;
 }
 
 function tryEntry(){
@@ -2742,16 +2750,50 @@ function tryEntry(){
   btn.disabled = true;
   btn.innerHTML = '<span class="entry-loading"></span>확인 중...';
 
-  setTimeout(()=>{
+  setTimeout(async ()=>{
     const decrypted = _xd(_EK, code);
 
     if(_validateKey(decrypted)){
-      // ✅ 정상 입장
+      // ✅ 정상 입장 — API 키 설정
       S.cfg.apiKey = decrypted;
-      sessionStorage.setItem('_ak', btoa(decrypted)); // 탭 유지용
+      sessionStorage.setItem('_ak', btoa(decrypted));
+
+      // GitHub 토큰 자동 복호화 및 연결
+      let ghAutoConnected = false;
+      if(_GT){
+        const ghToken = _xd(_GT, code);
+        if(_validateGHToken(ghToken)){
+          GH.token = ghToken;
+          sessionStorage.setItem('gh_token', ghToken);
+          btn.innerHTML = '<span class="entry-loading"></span>GitHub 연결 중...';
+          try {
+            const user = await ghFetch('/user');
+            GH.connected = true;
+            ghAutoConnected = true;
+            // GitHub 모달 UI도 업데이트
+            try {
+              document.getElementById('ghToken').value = ghToken;
+              document.getElementById('ghConnectBtn').className='gh-connect-btn connected';
+              document.getElementById('ghConnectBtn').innerHTML='✅ 연결됨 — 재연결하려면 클릭';
+              document.getElementById('ghConnectResult').style.display='block';
+              document.getElementById('ghConnectResult').innerHTML=`✅ 자동 연결: @${user.login}`;
+            } catch(_){}
+          } catch(_){
+            GH.connected = false;
+          }
+        }
+      }
+
+      // 입장 화면 숨기기
       document.getElementById('vEntry').style.display = 'none';
-      // GitHub 자동 연결 시도
-      if(GH.token) setTimeout(()=>sbCloudRefresh(), 500);
+
+      // 사이드바 GitHub 목록 새로고침
+      if(ghAutoConnected){
+        setTimeout(()=>sbCloudRefresh(), 300);
+      } else if(GH.token){
+        setTimeout(()=>sbCloudRefresh(), 500);
+      }
+
     } else {
       // ❌ 틀린 코드
       document.getElementById('entryErr').style.display = 'block';
@@ -2760,7 +2802,7 @@ function tryEntry(){
       btn.disabled = false;
       btn.innerHTML = '입장하기 →';
     }
-  }, 600); // 자연스러운 딜레이
+  }, 600);
 }
 
 function checkSession(){
@@ -2772,6 +2814,11 @@ function checkSession(){
       if(_validateKey(key)){
         S.cfg.apiKey = key;
         document.getElementById('vEntry').style.display = 'none';
+        // GitHub 토큰도 세션에서 복원
+        const cachedGH = sessionStorage.getItem('gh_token');
+        if(cachedGH && _validateGHToken(cachedGH)){
+          GH.token = cachedGH;
+        }
         return true;
       }
     } catch(_){}
