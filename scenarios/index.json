@@ -1,0 +1,13 @@
+{
+  "scenarios": [
+    {
+      "projKey": "새_이야기",
+      "title": "새 이야기",
+      "genre": "회귀/빙의",
+      "episodeCount": 1,
+      "savedAt": "2026-03-04T23:38:03.555Z",
+      "projId": "proj_1772667312115"
+    }
+  ],
+  "updatedAt": "2026-03-04T23:38:06.693Z"
+}
