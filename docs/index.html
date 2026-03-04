@@ -2063,7 +2063,7 @@ function exportEp(){
 // GITHUB 통합 — REST API v3
 // ════════════════════════════════════════════════════════════
 const GH = {
-  token:'', owner:'bridgecode0814', repo:'my-webnovel', branch:'main', path:'scenarios',
+  token:'', owner:'bridgecode0814', repo:'bridge-ai-novel', branch:'main', path:'scenarios',
   connected: false
 };
 
@@ -2496,10 +2496,11 @@ function updateGHStatus(){
 
 // localStorage에서 이전 설정 복원 (토큰 제외)
 function ghRestoreSettings(){
-  GH.owner  = localStorage.getItem('gh_owner')||'bridgecode0814';
-  GH.repo   = localStorage.getItem('gh_repo')||'my-webnovel';
-  GH.branch = localStorage.getItem('gh_branch')||'main';
-  GH.path   = localStorage.getItem('gh_path')||'scenarios';
+  // 배포 환경: 저장소 정보는 고정값 사용 (localStorage 덮어쓰기 방지)
+  GH.owner  = 'bridgecode0814';
+  GH.repo   = 'bridge-ai-novel';
+  GH.branch = 'main';
+  GH.path   = 'scenarios';
   // 세션 토큰 복원 (탭 유지 중에만)
   const savedToken = sessionStorage.getItem('gh_token');
   if(savedToken) GH.token = savedToken;
