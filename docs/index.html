@@ -482,6 +482,43 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
 .tut-final-btn.primary{background:linear-gradient(135deg,#2B6844,#22c55e);color:white}
 .tut-final-btn.secondary{background:var(--bg3);color:var(--text2);border:1.5px solid var(--border)}
 .tut-final-btn:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ══ 서재 뷰 ══ */
+#vLibrary{flex:1;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
+.lib-header{padding:24px 32px 16px;border-bottom:1px solid var(--border);background:white;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.lib-header-title{font-size:18px;font-weight:800;color:var(--text)}
+.lib-header-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.lib-back-btn{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:white;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;font-family:inherit}
+.lib-back-btn:hover{background:var(--bg3)}
+.lib-body{flex:1;overflow-y:auto;padding:28px 32px}
+.lib-empty{text-align:center;padding:80px 20px;color:var(--text4);font-size:13px;line-height:2}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.lib-card{background:white;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s;position:relative}
+.lib-card:hover{border-color:var(--green);box-shadow:0 4px 20px rgba(43,104,68,.12);transform:translateY(-2px)}
+.lib-card-cover{height:120px;background:linear-gradient(135deg,#1a2d3d,#0f1923);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
+.lib-card-cover-genre{position:absolute;bottom:8px;left:10px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);backdrop-filter:blur(4px)}
+.lib-card-body{padding:14px}
+.lib-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-card-meta{font-size:11px;color:var(--text3);margin-bottom:10px}
+.lib-card-btns{display:flex;gap:6px}
+.lib-card-btn{flex:1;padding:7px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid var(--border);background:white;color:var(--text2);transition:.15s}
+.lib-card-btn:hover{background:var(--bg3)}
+.lib-card-btn.primary{background:var(--green);color:white;border-color:var(--green)}
+.lib-card-btn.primary:hover{opacity:.88}
+.lib-card-loading{position:absolute;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);border-radius:14px;display:none}
+.lib-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px}
+
+/* 장르별 카드 색상 */
+.lib-card[data-genre="regression"] .lib-card-cover{background:linear-gradient(135deg,#0f1923,#1e3a5f)}
+.lib-card[data-genre="romance_fantasy"] .lib-card-cover{background:linear-gradient(135deg,#4a1942,#c76b98)}
+.lib-card[data-genre="hunter"] .lib-card-cover{background:linear-gradient(135deg,#0d1f2d,#1a4a6b)}
+.lib-card[data-genre="modern_fantasy"] .lib-card-cover{background:linear-gradient(135deg,#1a2a1a,#2d5a3d)}
+.lib-card[data-genre="murim"] .lib-card-cover{background:linear-gradient(135deg,#2a1a0f,#6b3a1f)}
+
+/* ── 미리보기 리더 모드 배지 ── */
+.reader-preview-badge{display:none;align-items:center;gap:8px;padding:6px 14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;font-size:11px;color:#92400e;font-weight:600}
+.reader-preview-badge.on{display:flex}
+.reader-preview-badge button{padding:4px 10px;border:1px solid #f59e0b;border-radius:6px;background:white;font-size:10px;cursor:pointer;font-family:inherit;color:#92400e;font-weight:600}
 </style>
 </head>
 <body>
@@ -535,6 +572,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
   </div>
 
   <div class="sb-footer">
+    <button class="sb-btn" onclick="openLibrary()" style="background:var(--green-bg);color:var(--green);font-weight:700">📚 서재 열기</button>
     <button class="sb-btn" onclick="goPhase('genre')">＋ 새 작품 만들기</button>
     <button class="sb-btn" onclick="showGH()">
       <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:middle;margin-right:4px"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -740,7 +778,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
         <!-- 스크롤 하단 액션바 (JS가 append) -->
       </div>
       <div class="reader-nav">
-        <button class="reader-back-btn" onclick="goPhase('create')">← 편집으로</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="reader-back-btn" id="readerBackBtn" onclick="readerBack()">← 편집으로</button>
+          <div class="reader-preview-badge" id="previewBadge">
+            👁 미리보기 모드
+            <button onclick="goPhase('library')">← 서재로</button>
+          </div>
+        </div>
         <div style="display:flex;align-items:center;gap:6px">
           <button class="rnav-btn" id="rnavPrev" onclick="readerNav(-1)" disabled>← 이전</button>
           <span id="rnavInfo" style="font-size:11px;color:var(--text3)"></span>
@@ -751,6 +795,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
     </div>
   </div>
 </div>
+
+  <!-- ══ 서재 뷰 ══ -->
+  <div id="vLibrary">
+    <div class="lib-header">
+      <div>
+        <div class="lib-header-title">📚 서재</div>
+        <div class="lib-header-sub" id="libSubTitle">GitHub에 저장된 모든 작품</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="lib-back-btn" onclick="goPhase('create')" id="libBackToEdit" style="display:none">← 편집으로</button>
+        <button class="lib-back-btn" onclick="goPhase('genre')">＋ 새 작품</button>
+        <button class="lib-back-btn" onclick="sbCloudRefresh();renderLibrary()">↻ 새로고침</button>
+      </div>
+    </div>
+    <div class="lib-body">
+      <div id="libGrid" class="lib-grid"></div>
+    </div>
+  </div>
 
 
 <!-- GITHUB MODAL -->
@@ -888,9 +950,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
 <!-- ══ 온보딩 튜토리얼 ══ -->
 <div id="vTutorial">
   <div class="tut-card">
-    <!-- 진행 바 -->
-    <div class="tut-progress"><div class="tut-progress-fill" id="tutFill" style="width:20%"></div></div>
-
+    <div class="tut-progress"><div class="tut-progress-fill" id="tutFill" style="width:17%"></div></div>
     <div class="tut-header">
       <div class="tut-step-dots">
         <div class="tut-dot on" id="tutDot0"></div>
@@ -898,32 +958,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
         <div class="tut-dot" id="tutDot2"></div>
         <div class="tut-dot" id="tutDot3"></div>
         <div class="tut-dot" id="tutDot4"></div>
+        <div class="tut-dot" id="tutDot5"></div>
       </div>
     </div>
-
     <div class="tut-body">
 
       <!-- STEP 1: 환영 -->
       <div class="tut-step on" id="tutStep0">
         <div class="tut-icon">✦</div>
         <div class="tut-title">브릿지AI에 오신 것을<br>환영합니다!</div>
-        <div class="tut-desc">AI와 함께 웹소설을 쉽고 빠르게 만들어보세요.<br>3분이면 첫 번째 소설을 완성할 수 있어요.</div>
+        <div class="tut-desc">AI와 함께 웹소설을 쉽고 빠르게 만들어보세요.<br>30초면 첫 번째 소설을 완성할 수 있어요.</div>
         <div class="tut-img">
           <div class="tut-img-inner">
-            <div style="font-size:11px;font-weight:700;color:var(--text3);text-align:center;margin-bottom:4px">브릿지AI로 할 수 있는 것</div>
+            <div style="font-size:11px;font-weight:700;color:var(--text3);text-align:center;margin-bottom:6px">브릿지AI로 할 수 있는 것</div>
             <div class="tut-flow">
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">1</div>
-                <div class="tut-flow-text"><b>📝 AI 소설 생성</b>장르·시놉시스만 입력하면 Claude가 본문을 완성</div>
-              </div>
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">2</div>
-                <div class="tut-flow-text"><b>🎨 자동 일러스트</b>핵심 장면에 AI 이미지가 자동 삽입</div>
-              </div>
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">3</div>
-                <div class="tut-flow-text"><b>💾 GitHub 저장</b>작품을 클라우드에 저장하고 언제든 불러오기</div>
-              </div>
+              <div class="tut-flow-item"><div class="tut-flow-num">1</div><div class="tut-flow-text"><b>📝 AI 소설 자동 생성</b>장르·시놉시스만 입력하면 Claude가 2,000~3,000자 본문 완성</div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">2</div><div class="tut-flow-text"><b>🎨 장르별 AI 일러스트</b>핵심 장면에 장르 스타일 맞춤 이미지 자동 삽입</div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">3</div><div class="tut-flow-text"><b>📚 서재 — 작품 전환</b>여러 작품을 동시에 관리, 현재 작업 유지하며 다른 작품 읽기</div></div>
             </div>
           </div>
         </div>
@@ -933,7 +984,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
       <div class="tut-step" id="tutStep1">
         <div class="tut-icon">🎭</div>
         <div class="tut-title">STEP 1 — 장르 선택</div>
-        <div class="tut-desc">원하는 장르를 고르면 그에 맞는 AI 프롬프트와<br>이미지 스타일이 자동으로 설정됩니다.</div>
+        <div class="tut-desc">장르를 고르면 AI 프롬프트와 이미지 스타일이<br>자동으로 최적화됩니다.</div>
         <div class="tut-img">
           <div class="tut-img-inner">
             <div class="tut-chip-row">
@@ -943,7 +994,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
               <div class="tut-chip">🌆 현대 판타지</div>
               <div class="tut-chip">🥋 무협</div>
             </div>
-            <div class="tut-tip">💡 <b>추천:</b> 처음이라면 <b>헌터물</b>이나 <b>회귀물</b>부터 시작해보세요. 가장 풍부한 예시와 프롬프트가 준비되어 있어요.</div>
+            <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px">장르마다 다른 이미지 색감과 화풍이 적용돼요</div>
+            <div class="tut-tip">💡 <b>이미지 스타일 예시</b><br>
+              회귀물 → 차가운 파란 달빛, 드라마틱 조명<br>
+              로맨스 판타지 → 파스텔 수채화, 꽃잎<br>
+              헌터물 → 네온 블루, 다이나믹 전투 구도
+            </div>
           </div>
         </div>
       </div>
@@ -952,59 +1008,64 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
       <div class="tut-step" id="tutStep2">
         <div class="tut-icon">📋</div>
         <div class="tut-title">STEP 2 — 작품 설정</div>
-        <div class="tut-desc">작품명과 시놉시스만 입력하면 됩니다.<br>나머지는 AI가 알아서 채워줘요.</div>
+        <div class="tut-desc">작품명과 시놉시스만 입력하면 됩니다.<br>나머지는 AI가 채워줘요.</div>
         <div class="tut-img">
           <div class="tut-img-inner" style="gap:6px">
             <div style="font-size:10px;font-weight:700;color:var(--text3)">작품명</div>
             <div class="tut-mock-input">예: 나 혼자만 레벨업</div>
-            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:4px">시놉시스 (줄거리 힌트)</div>
-            <div class="tut-mock-input" style="min-height:52px">던전이 열린 세상, 최약체로 각성한 주인공이 숨겨진 능력을 발견하게 되는데...</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:4px">시놉시스</div>
+            <div class="tut-mock-input" style="min-height:52px">던전이 열린 세상, 최약체로 각성한 주인공이 숨겨진 능력을 발견하는데...</div>
             <button class="tut-mock-btn">✦ 작성 시작</button>
           </div>
         </div>
-        <div class="tut-tip" style="margin-top:0">💡 시놉시스는 길지 않아도 괜찮아요. <b>핵심 상황과 주인공 특징</b>만 적어주면 AI가 나머지를 완성해요.</div>
+        <div class="tut-tip" style="margin-top:0">💡 <b>핵심만 짧게</b> 입력해도 충분해요. 주인공 상황 + 특징만 적으면 AI가 나머지를 완성합니다.</div>
       </div>
 
-      <!-- STEP 4: 결과 활용 -->
+      <!-- STEP 4: 이미지 & 편집 -->
       <div class="tut-step" id="tutStep3">
-        <div class="tut-icon">⚡</div>
-        <div class="tut-title">STEP 3 — 생성 & 편집</div>
-        <div class="tut-desc">AI가 소설을 완성하면 바로 편집·개선할 수 있어요.</div>
+        <div class="tut-icon">🎨</div>
+        <div class="tut-title">STEP 3 — AI 이미지 & 편집</div>
+        <div class="tut-desc">생성된 소설에 장면 이미지가 자동 삽입되고<br>다양한 방법으로 개선할 수 있어요.</div>
         <div class="tut-img">
           <div class="tut-img-inner">
             <div class="tut-flow">
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">🔍</div>
-                <div class="tut-flow-text"><b>AI 비평</b>플롯·캐릭터·페이싱을 점수로 평가받고 개선점 확인</div>
-              </div>
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">↺</div>
-                <div class="tut-flow-text"><b>재작성</b>마음에 안 드는 부분은 작가 노트를 남기고 다시 생성</div>
-              </div>
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">✦</div>
-                <div class="tut-flow-text"><b>다음 화 작성</b>이전 화의 맥락을 이어받아 연속 생성</div>
-              </div>
-              <div class="tut-flow-item">
-                <div class="tut-flow-num">📖</div>
-                <div class="tut-flow-text"><b>완성본 보기</b>이미지와 함께 완성된 소설을 리더 뷰로 감상</div>
-              </div>
+              <div class="tut-flow-item"><div class="tut-flow-num">🎨</div><div class="tut-flow-text"><b>자동 이미지</b>소설 본문 내 [IMAGE:] 태그 위치에 장르 맞춤 일러스트 자동 생성 (GitHub 불러오기 시에도 자동 재생성)</div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">🔍</div><div class="tut-flow-text"><b>AI 비평</b>플롯·캐릭터·페이싱·감성 4항목 점수 + 개선점 3가지 제시</div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">↺</div><div class="tut-flow-text"><b>재작성</b>작가 노트를 남기고 원하는 방향으로 다시 생성</div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">✦</div><div class="tut-flow-text"><b>다음 화 작성</b>이전 화 맥락을 이어받아 자동으로 다음 이야기 작성</div></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- STEP 5: 시작 -->
+      <!-- STEP 5: 서재 -->
       <div class="tut-step" id="tutStep4">
+        <div class="tut-icon">📚</div>
+        <div class="tut-title">STEP 4 — 서재로 작품 관리</div>
+        <div class="tut-desc">여러 작품을 동시에 관리하고<br>현재 작업을 잃지 않고 다른 작품을 읽을 수 있어요.</div>
+        <div class="tut-img">
+          <div class="tut-img-inner">
+            <div class="tut-flow">
+              <div class="tut-flow-item"><div class="tut-flow-num">📚</div><div class="tut-flow-text"><b>서재 열기</b>사이드바 "📚 서재 열기" 버튼 → GitHub에 저장된 모든 작품을 카드로 확인</div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">👁</div><div class="tut-flow-text"><b>📖 읽기 버튼</b>현재 편집 작업을 유지한 채로 다른 작품을 미리보기 모드로 열기<br><span style="color:var(--green);font-weight:600">← 무림대협 편집 중 나혼만 읽기 가능!</span></div></div>
+              <div class="tut-flow-item"><div class="tut-flow-num">✏️</div><div class="tut-flow-text"><b>✏️ 편집 버튼</b>해당 작품을 편집 모드로 전환 (현재 작업은 GitHub에 먼저 저장 권장)</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="tut-tip">💡 미리보기 모드에서는 상단에 <b>노란색 "👁 미리보기 모드"</b> 배지가 표시됩니다. "← 서재로" 버튼으로 언제든 돌아올 수 있어요.</div>
+      </div>
+
+      <!-- STEP 6: 시작 -->
+      <div class="tut-step" id="tutStep5">
         <div class="tut-icon">🚀</div>
         <div class="tut-title">모든 준비가 됐어요!</div>
-        <div class="tut-desc">지금 바로 첫 번째 소설을 만들어보세요.<br>언제든 튜토리얼은 다시 볼 수 있어요.</div>
+        <div class="tut-desc">지금 바로 첫 번째 소설을 만들어보세요.<br>언제든 사이드바 하단 ❓ 사용 가이드로 다시 볼 수 있어요.</div>
         <div class="tut-tip" style="margin-bottom:16px">
-          <b>💡 첫 소설 빠르게 만드는 팁</b><br>
-          1. <b>헌터물</b> 선택<br>
-          2. 인기 질문 <b>"나 혼자만 레벨업"</b> 클릭<br>
-          3. 바로 <b>✦ 작성 시작</b> 누르기<br>
-          → 약 30초면 1화 + 이미지 완성!
+          <b>⚡ 30초 빠른 시작</b><br>
+          1. <b>헌터물</b> 선택 후 "나 혼자만 레벨업" 인기 질문 클릭<br>
+          2. 바로 <b>✦ 작성 시작</b> 클릭<br>
+          3. 완성 후 📖 완성본 보기로 이미지 확인<br>
+          4. 💾 GitHub 저장 → 📚 서재에서 관리
         </div>
         <div class="tut-final-btns">
           <button class="tut-final-btn primary" onclick="closeTutorial(true)">✦ 지금 바로 시작하기</button>
@@ -1013,7 +1074,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
       </div>
 
     </div><!-- /tut-body -->
-
     <div class="tut-footer" id="tutFooter">
       <button class="tut-prev" id="tutPrevBtn" onclick="tutPrev()" style="display:none">← 이전</button>
       <button class="tut-next" id="tutNextBtn" onclick="tutNext()">다음 →</button>
@@ -1283,13 +1343,21 @@ const S = {
 function goPhase(p){
   S.phase = p;
   // 입장 화면은 goPhase로 제어하지 않음 (tryEntry에서만 숨김)
-  document.getElementById('vGenre').style.display   = p==='genre'  ? 'flex' : 'none';
-  document.getElementById('vHome').style.display    = p==='home'   ? 'flex' : 'none';
-  document.getElementById('vCreate').style.display  = p==='create' ? 'flex' : 'none';
-  document.getElementById('vReader').style.display  = p==='reader' ? 'flex' : 'none';
+  document.getElementById('vGenre').style.display    = p==='genre'   ? 'flex' : 'none';
+  document.getElementById('vHome').style.display     = p==='home'    ? 'flex' : 'none';
+  document.getElementById('vCreate').style.display   = p==='create'  ? 'flex' : 'none';
+  document.getElementById('vReader').style.display   = p==='reader'  ? 'flex' : 'none';
+  document.getElementById('vLibrary').style.display  = p==='library' ? 'flex' : 'none';
+  // 서재에서 돌아올 편집 버튼 표시 여부
+  const backBtn = document.getElementById('libBackToEdit');
+  if(backBtn) backBtn.style.display = (p==='library' && S.episodes.length>0) ? '' : 'none';
   document.getElementById('promptBtn').style.display  = ['create'].includes(p) ? '' : 'none';
   document.getElementById('readerBtn').style.display  = p==='create' && S.episodes.length>0 ? '' : 'none';
-  if(p==='reader') renderReader();
+  if(p==='reader'){
+    if(PREVIEW.active) renderPreviewReader();
+    else renderReader();
+  }
+  if(p==='library') renderLibrary();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1484,6 +1552,7 @@ async function processImages(text){
 }
 
 // 텍스트 + 이미지를 HTML로 렌더링
+// imageMap이 없어도 [IMAGE: desc] 태그에서 자동으로 URL 생성
 function renderEpisodeHTML(text, imageMap={}){
   const regex = /\[IMAGE:\s*([^\]]+)\]/gi;
   let result = '';
@@ -1493,9 +1562,11 @@ function renderEpisodeHTML(text, imageMap={}){
     result += escHtml(text.slice(lastIdx, m.index));
     const tag = m[0];
     const desc = m[1].trim();
-    if(imageMap[tag]?.url){
+    // imageMap에 URL이 없으면 자동 생성 (GitHub 불러오기·미리보기 모드 대응)
+    const resolvedUrl = imageMap[tag]?.url || buildPollinationsUrl(desc);
+    if(resolvedUrl){
       const imgId = 'img_'+Math.random().toString(36).slice(2,8);
-      const iUrl  = imageMap[tag].url;
+      const iUrl  = resolvedUrl;
       const iDesc = desc.replace(/`/g,'').replace(/'/g,'\u2019').slice(0,120);
       // ★ display:none 방식 제거 — innerHTML 동적 삽입 시 onload가 이미 소실되는 버그 수정
       // skeleton을 absolute 오버레이로, img는 처음부터 렌더링
@@ -1922,6 +1993,12 @@ function renderReaderEp(){
 }
 
 function readerNav(dir){
+  if(PREVIEW.active){
+    const next = PREVIEW.epIdx + dir;
+    if(next<0 || next>=PREVIEW.episodes.length) return;
+    PREVIEW.epIdx = next; renderPreviewEp(); renderPreviewToc();
+    return;
+  }
   const next = S.readerEpIdx + dir;
   if(next<0 || next>=S.episodes.length) return;
   S.readerEpIdx = next; renderReaderEp(); renderTocList();
@@ -2731,6 +2808,8 @@ async function sbCloudRefresh(){
 
     // 데이터 배열을 전역으로 캐싱 → onclick에서 index로 참조 (이스케이프 이슈 방지)
     window._sbCloudList = list;
+    // 서재가 열려있으면 자동 업데이트
+    if(S.phase === 'library') renderLibrary();
     body.innerHTML = list.map((s,i) => {
       const date = new Date(s.savedAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
       return `
@@ -2738,7 +2817,8 @@ async function sbCloudRefresh(){
         <div class="sb-cloud-name">📚 ${escHtml(s.title)}</div>
         <div class="sb-cloud-meta">${escHtml(s.genre||'')} · ${s.episodeCount||0}화 · ${date}</div>
         <div class="sb-cloud-acts">
-          <button class="sb-cloud-btn load" onclick="sbCloudLoadByIdx(${i})">📥 불러오기</button>
+          <button class="sb-cloud-btn load" onclick="openBookFromLib(${i})" title="현재 작업 유지하며 읽기">📖 읽기</button>
+          <button class="sb-cloud-btn" onclick="sbCloudLoadByIdx(${i})" title="편집 모드로 불러오기" style="background:var(--bg3);color:var(--text2)">✏️ 편집</button>
           <button class="sb-cloud-btn" onclick="window.open('https://github.com/${GH.owner}/${GH.repo}/tree/${GH.branch}/${GH.path}/${encodeURIComponent(s.projKey)}','_blank')" title="GitHub에서 열기">🔗</button>
           <button class="sb-cloud-btn del" onclick="sbCloudDeleteByIdx(${i})">🗑</button>
         </div>
@@ -2898,10 +2978,238 @@ function hideLoadOverlay(){
 
 
 
+
+// ════════════════════════════════════════════════════════════
+// 서재 & 미리보기 리더
+// ════════════════════════════════════════════════════════════
+
+// 미리보기 전용 상태 (S.episodes 건드리지 않음)
+const PREVIEW = {
+  active: false,       // 미리보기 모드 여부
+  episodes: [],
+  proj: {},
+  epIdx: 0,
+  projKey: null
+};
+
+// 서재 열기
+function openLibrary(){
+  if(!GH.connected){
+    showToast('GitHub 연결이 필요합니다. GitHub 설정을 확인해주세요.');
+    return;
+  }
+  renderLibrary();
+  goPhase('library');
+}
+
+// 서재 카드 렌더링
+function renderLibrary(){
+  const grid = document.getElementById('libGrid');
+  if(!grid) return;
+  const list = window._sbCloudList || [];
+
+  if(!list.length){
+    grid.innerHTML = '<div class="lib-empty">📭 저장된 작품이 없어요<br><small>새 작품을 만들고 저장하면 여기에 표시됩니다</small></div>';
+    document.getElementById('libSubTitle').textContent = 'GitHub에 저장된 모든 작품';
+    return;
+  }
+
+  document.getElementById('libSubTitle').textContent = `총 ${list.length}편의 작품이 저장되어 있어요`;
+
+  const GENRE_EMOJI = {regression:'🔄', romance_fantasy:'💕', hunter:'⚔️', modern_fantasy:'🌆', murim:'🥋'};
+  const GENRE_LABEL = {regression:'회귀물', romance_fantasy:'로맨스 판타지', hunter:'헌터물', modern_fantasy:'현대 판타지', murim:'무협'};
+
+  grid.innerHTML = list.map((sc, i) => {
+    const emoji = GENRE_EMOJI[sc.chipKey] || '📝';
+    const genreLabel = GENRE_LABEL[sc.chipKey] || sc.genre || '웹소설';
+    const isCurrentWork = S.proj.projId && sc.projId === S.proj.projId;
+    return `
+    <div class="lib-card" data-genre="${sc.chipKey||'hunter'}" onclick="openBookFromLib(${i})">
+      <div class="lib-card-cover">
+        <span style="font-size:42px">${emoji}</span>
+        <div class="lib-card-cover-genre">${genreLabel}</div>
+        ${isCurrentWork ? '<div style="position:absolute;top:8px;right:8px;background:var(--green);color:white;font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px">✏️ 작업중</div>' : ''}
+      </div>
+      <div class="lib-card-body">
+        <div class="lib-card-title" title="${escHtml(sc.title)}">${escHtml(sc.title)}</div>
+        <div class="lib-card-meta">${sc.episodeCount||0}화 · ${sc.savedAt ? sc.savedAt.slice(0,10) : ''}</div>
+        <div class="lib-card-btns">
+          <button class="lib-card-btn primary" onclick="event.stopPropagation();openBookFromLib(${i})">📖 읽기</button>
+          <button class="lib-card-btn" onclick="event.stopPropagation();sbCloudLoadByIdx(${i})">✏️ 편집</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// 서재에서 "읽기" — 현재 작업 유지하며 미리보기로 열기
+async function openBookFromLib(i){
+  const sc = window._sbCloudList?.[i];
+  if(!sc) return;
+
+  // 이미 편집 중인 작품이면 그냥 reader로
+  if(S.proj.projId && sc.projId === S.proj.projId){
+    goPhase('reader');
+    return;
+  }
+
+  // 미리보기 모드로 로드
+  showLoadOverlay('📖 불러오는 중...', `"${sc.title}" 읽기 준비 중`, 10);
+  try {
+    setLoadProgress('작품 정보 읽는 중...', 25);
+    const metaRaw = await ghGetFile(`${GH.path}/${sc.projKey}/meta.json`);
+    const meta = JSON.parse(metaRaw);
+    const episodes = [];
+    const total = meta.episodeCount || 1;
+    for(let ei = 1; ei <= total; ei++){
+      setLoadProgress(`${ei}화 / ${total}화 불러오는 중...`, 25 + Math.round((ei/total)*65));
+      const epKey = `ep${String(ei).padStart(3,'0')}`;
+      try {
+        const md = await ghGetFile(`${GH.path}/${sc.projKey}/${epKey}.md`);
+        const body = md.replace(/^---[\s\S]*?---\n*/,'').trim();
+        const content = body.replace(/^>\s*🎨 \*\*\[이미지 장면\]\*\*\s*(.+)$/mg,'[IMAGE: $1]');
+        const titleMatch = md.match(/^##\s+(.+)/m);
+        episodes.push({
+          id:`ep_${String(ei).padStart(3,'0')}`, num:ei,
+          title: titleMatch ? titleMatch[1].trim() : `${meta.title} ${ei}화`,
+          content, imageMap:{}, scenes:[], critique:null
+        });
+      } catch(_){}
+    }
+
+    setLoadProgress('화면 구성 중...', 95);
+
+    // PREVIEW 상태에 저장 (S는 건드리지 않음)
+    PREVIEW.active   = true;
+    PREVIEW.episodes = episodes;
+    PREVIEW.proj     = meta;
+    PREVIEW.epIdx    = 0;
+    PREVIEW.projKey  = sc.projKey;
+
+    hideLoadOverlay();
+
+    // 미리보기 리더 렌더링
+    renderPreviewReader();
+    goPhase('reader');
+
+  } catch(e){
+    hideLoadOverlay();
+    showToast('불러오기 실패: ' + e.message);
+  }
+}
+
+// 미리보기 리더 렌더링
+function renderPreviewReader(){
+  const badge = document.getElementById('previewBadge');
+  const backBtn = document.getElementById('readerBackBtn');
+  if(PREVIEW.active){
+    badge.classList.add('on');
+    backBtn.style.display = 'none';
+    // TOC
+    const tocTitle = document.getElementById('tocTitle');
+    if(tocTitle) tocTitle.textContent = `📚 ${PREVIEW.proj.title||''}`;
+    renderPreviewToc();
+    renderPreviewEp();
+  } else {
+    badge.classList.remove('on');
+    backBtn.style.display = '';
+    renderReader(); // 기존 편집 리더
+  }
+}
+
+function renderPreviewToc(){
+  const sec = document.getElementById('tocSec1');
+  if(!sec) return;
+  sec.innerHTML = PREVIEW.episodes.map((e,i)=>`
+    <div class="toc-ep ${i===PREVIEW.epIdx?'active':''}" onclick="previewEpClick(${i})">
+      <div class="toc-ep-num">${e.id}</div>
+      <div class="toc-ep-tit">${escHtml(e.title)}</div>
+    </div>`).join('');
+}
+
+function previewEpClick(i){
+  PREVIEW.epIdx = i;
+  renderPreviewToc();
+  renderPreviewEp();
+}
+
+function renderPreviewEp(){
+  const ep = PREVIEW.episodes[PREVIEW.epIdx];
+  if(!ep) return;
+  const content = document.getElementById('readerContent');
+  // 미리보기 모드: 장르 스타일을 PREVIEW 작품 기준으로 임시 적용
+  const _savedChipKey = S.chipKey;
+  S.chipKey = PREVIEW.proj.chipKey || S.chipKey || 'hunter';
+  const bodyHtml = renderEpisodeHTML(ep.content, ep.imageMap||{});
+  S.chipKey = _savedChipKey; // 복원
+  const proj = PREVIEW.proj;
+
+  content.innerHTML = `
+    <div class="reader-ep-header">
+      <div class="reader-ep-num">${ep.id}</div>
+      <div class="reader-ep-title">${escHtml(ep.title)}</div>
+      <div class="reader-ep-meta">📚 ${escHtml(proj.genre||'웹소설')} · ${escHtml(proj.target||'')}</div>
+    </div>
+    <div class="reader-body">${bodyHtml}</div>
+    <div class="ep-action-bar" style="justify-content:center">
+      <button class="eab-btn sv" onclick="loadPreviewForEdit()">✏️ 이 작품 편집하기</button>
+      <button class="eab-btn" onclick="goPhase('library')" style="background:var(--bg3);color:var(--text2)">← 서재로</button>
+    </div>`;
+
+  // 네비
+  document.getElementById('rnavPrev').disabled  = PREVIEW.epIdx <= 0;
+  document.getElementById('rnavNext').disabled  = PREVIEW.epIdx >= PREVIEW.episodes.length - 1;
+  document.getElementById('rnavInfo').textContent = `${PREVIEW.epIdx+1} / ${PREVIEW.episodes.length} 화`;
+  const wb = document.getElementById('rnavWrite');
+  if(wb) wb.style.display = 'none';
+  document.getElementById('readerScroll').scrollTop = 0;
+}
+
+// 미리보기 → 편집 전환 (이 시점에서만 S 덮어씀)
+function loadPreviewForEdit(){
+  if(!PREVIEW.active) return;
+  if(S.episodes.length > 0){
+    if(!confirm(`현재 편집 중인 "${S.proj.title||'작품'}"이 있어요.\n"${PREVIEW.proj.title}"을 편집 모드로 전환하면 현재 작업이 사라집니다.\n계속할까요?`)) return;
+  }
+  S.proj      = { title:PREVIEW.proj.title, genre:PREVIEW.proj.genre||'웹소설',
+                  target:PREVIEW.proj.target||'', style:PREVIEW.proj.style||'',
+                  hero:PREVIEW.proj.hero||'', synopsis:PREVIEW.proj.synopsis||'',
+                  epId:'ep_001', projId:PREVIEW.proj.projId||'' };
+  S.chipKey   = PREVIEW.proj.chipKey || null;
+  S.prompts   = buildDefaultPrompts(S.chipKey||'hunter');
+  S.episodes  = [...PREVIEW.episodes];
+  S.notes     = [];
+  S.curEpIdx  = 0;
+  S.readerEpIdx = 0;
+  PREVIEW.active = false;
+
+  document.getElementById('chatMsgs').innerHTML = '';
+  document.getElementById('tbLeft').innerHTML = `📚 ${S.proj.title}`;
+  document.getElementById('genreBadge').textContent = '📚 웹소설';
+  document.getElementById('genreBadge').style.display = '';
+  document.getElementById('readerBtn').style.display = '';
+  document.getElementById('ghSaveBtn').style.display = '';
+  document.getElementById('promptBtn').style.display = '';
+  renderSidebar();
+  renderNotes();
+  goPhase('create');
+  showToast(`✅ "${S.proj.title}" 편집 모드로 전환됐어요`);
+}
+
+// 리더 뒤로 가기 (미리보기/편집 분기)
+function readerBack(){
+  if(PREVIEW.active){
+    PREVIEW.active = false;
+    goPhase('library');
+  } else {
+    goPhase('create');
+  }
+}
+
 // ════════════════════════════════════════════════════════════
 // 온보딩 튜토리얼
 // ════════════════════════════════════════════════════════════
-const TUT_TOTAL = 5;
+const TUT_TOTAL = 6;
 let _tutStep = 0;
 
 function showTutorial(){
@@ -2945,6 +3253,7 @@ function _tutRender(){
   });
   // 진행바
   document.getElementById('tutFill').style.width = (((_tutStep+1)/TUT_TOTAL)*100)+'%';
+  // 마지막 스텝 id 업데이트 (6번째 = index 5)
   // 버튼
   const prev = document.getElementById('tutPrevBtn');
   const next = document.getElementById('tutNextBtn');
