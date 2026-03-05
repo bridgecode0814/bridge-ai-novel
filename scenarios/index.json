@@ -1,6 +1,14 @@
 {
   "scenarios": [
     {
+      "projKey": "무림_대협",
+      "title": "무림 대협",
+      "genre": "무협",
+      "episodeCount": 1,
+      "savedAt": "2026-03-05T00:17:21.648Z",
+      "projId": "proj_1772669645707"
+    },
+    {
       "projKey": "나혼자만_상장의_신",
       "title": "나혼자만 상장의 신",
       "genre": "현대 판타지",
@@ -9,5 +17,5 @@
       "projId": "proj_1772661129891"
     }
   ],
-  "updatedAt": "2026-03-04T22:51:52.396Z"
+  "updatedAt": "2026-03-05T00:17:24.511Z"
 }
