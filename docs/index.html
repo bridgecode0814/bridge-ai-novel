@@ -1114,10 +1114,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh
       </div>
     </div>
     <div id="hfTokenStatus" style="font-size:11px;padding:6px 8px;border-radius:6px;display:none;margin-bottom:6px"></div>
-    <div class="modal-field" style="margin-top:4px">
-      <label class="modal-label">n8n Webhook URL</label>
-      <input class="modal-input" id="cfgUrl" value="https://bridge-ai.app.n8n.cloud/webhook"/>
+
+    <div class="modal-field">
+      <label class="modal-label">🖼 이미지 생성 모델</label>
+      <select class="modal-input" id="cfgImgModel" style="cursor:pointer">
+        <option value="sdxl">SDXL (추천 · 라이선스 동의 불필요)</option>
+        <option value="flux-schnell">FLUX.1-schnell (고품질 · 라이선스 동의 필요)</option>
+      </select>
+      <div id="fluxNotice" style="display:none;margin-top:6px;padding:8px 10px;background:#fff8e1;border-radius:8px;border:1px solid #fcd34d;font-size:11px;color:#92400e;line-height:1.6">
+        ⚠️ FLUX 사용 전 <a href="https://huggingface.co/black-forest-labs/FLUX.1-schnell" target="_blank" style="color:var(--green);font-weight:600">이 링크</a>에서 로그인 후 <b>Agree and access repository</b> 버튼을 눌러 라이선스 동의가 필요합니다.
+      </div>
     </div>
+
     <div class="test-result" id="testResult"></div>
     <button class="modal-save" onclick="saveCfg()">저장</button>
     <button class="modal-test" onclick="testApi()">🔌 Claude API 연결 테스트</button>
@@ -1341,7 +1349,7 @@ function buildDefaultPrompts(chipKey){
 // 상태
 // ════════════════════════════════════════════════════════════
 const S = {
-  cfg:{ url:'https://bridge-ai.app.n8n.cloud/webhook', apiKey:'', hfToken:'' }, // 런타임에 복호화하여 주입
+  cfg:{ apiKey:'', hfToken:'', imgModel:'sdxl' }, // 런타임에 복호화하여 주입
   genre: 'webnovel',
   chipKey: null,
   proj:{ title:'', genre:'', target:'', style:'', hero:'', synopsis:'', epId:'ep_001', projId:'' },
@@ -1537,35 +1545,65 @@ function buildImagePrompt(desc){
 
 // HuggingFace FLUX 이미지 생성 → blob URL 반환
 // 토큰 없으면 null 반환
-async function fetchHFImage(prompt){
+async function fetchHFImage(prompt, retryCount=0){
   const token = S.cfg.hfToken;
   if(!token) return null;
 
-  // FLUX.1-schnell: 빠름(~5초), FLUX.1-dev: 고품질(~15초)
-  const MODEL = 'black-forest-labs/FLUX.1-schnell';
-  const res = await fetch(
-    `https://api-inference.huggingface.co/models/${MODEL}`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: { width: 768, height: 512, num_inference_steps: 4 }
-      })
-    }
-  );
+  // 모델 선택 (기본: SDXL - 라이선스 동의 불필요)
+  const modelMap = {
+    'sdxl':         'stabilityai/stable-diffusion-xl-base-1.0',
+    'flux-schnell': 'black-forest-labs/FLUX.1-schnell',
+  };
+  const MODEL = modelMap[S.cfg.imgModel||'sdxl'] || modelMap.sdxl;
+
+  const isFlux = MODEL.includes('FLUX');
+  const body = isFlux
+    ? { inputs: prompt, parameters: { width: 768, height: 512, num_inference_steps: 4 } }
+    : { inputs: prompt, parameters: { width: 768, height: 512, num_inference_steps: 25, guidance_scale: 7.5 } };
+
+  let res;
+  try {
+    res = await fetch(
+      `https://api-inference.huggingface.co/models/${MODEL}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'X-Wait-For-Model': 'true'  // 콜드스타트 자동 대기
+        },
+        body: JSON.stringify(body)
+      }
+    );
+  } catch(netErr) {
+    throw new Error('네트워크 오류 — 인터넷 연결을 확인해주세요');
+  }
 
   if(!res.ok){
-    const err = await res.text().catch(()=>'');
-    // 모델 로딩 중(503) → 잠시 후 재시도
-    if(res.status === 503){
-      await new Promise(r => setTimeout(r, 8000));
-      return fetchHFImage(prompt);
+    const errText = await res.text().catch(()=>'');
+    if(res.status === 503 && retryCount < 2){
+      // 모델 로딩 중 — 재시도
+      await new Promise(r => setTimeout(r, 10000));
+      return fetchHFImage(prompt, retryCount+1);
     }
-    throw new Error(`HF API ${res.status}: ${err.slice(0,100)}`);
+    if(res.status === 403){
+      throw new Error('접근 거부(403) — FLUX 사용 시 HuggingFace에서 라이선스 동의 필요. 설정에서 SDXL로 변경해보세요.');
+    }
+    if(res.status === 401){
+      throw new Error('인증 실패(401) — HF 토큰을 다시 확인해주세요');
+    }
+    if(res.status === 429){
+      throw new Error('요청 한도 초과(429) — 잠시 후 재시도해주세요');
+    }
+    throw new Error(`HF API 오류 ${res.status}: ${errText.slice(0,80)}`);
+  }
+
+  const contentType = res.headers.get('content-type')||'';
+  if(!contentType.startsWith('image/')){
+    // JSON 에러 응답인 경우
+    const json = await res.json().catch(()=>({}));
+    if(json.error) throw new Error(json.error.slice(0,100));
+    throw new Error('이미지 응답이 아닙니다. 모델이 아직 로딩 중일 수 있어요.');
   }
 
   const blob = await res.blob();
@@ -2410,7 +2448,6 @@ function insertPEVar(id,v){ const el=document.getElementById(id); const s=el.sel
 // 설정
 // ════════════════════════════════════════════════════════════
 function showCfg(){
-  document.getElementById('cfgUrl').value=S.cfg.url;
   document.getElementById('cfgHfToken').value=S.cfg.hfToken||'';
   const st=document.getElementById('hfTokenStatus');
   if(S.cfg.hfToken){
@@ -2420,16 +2457,27 @@ function showCfg(){
     st.style.display='block';st.style.background='#fff8e1';st.style.color='#b45309';
     st.textContent='⚠️ HF 토큰 없음 — 이미지 생성이 작동하지 않습니다';
   }
+  // 모델 선택 복원
+  const mdSel = document.getElementById('cfgImgModel');
+  if(mdSel) mdSel.value = S.cfg.imgModel||'sdxl';
+  const fluxNotice = document.getElementById('fluxNotice');
+  if(fluxNotice) fluxNotice.style.display = (S.cfg.imgModel==='flux-schnell') ? 'block' : 'none';
+  // 모델 변경 시 FLUX 안내 토글
+  if(mdSel) mdSel.onchange = ()=>{
+    if(fluxNotice) fluxNotice.style.display = mdSel.value==='flux-schnell' ? 'block' : 'none';
+  };
   const kd = document.getElementById('cfgKeyDisplay');
   if(kd) kd.textContent = S.cfg.apiKey ? `✅ 설정됨 (${S.cfg.apiKey.slice(0,12)}...)` : '❌ 미설정 — 입장 코드 재입력 필요';
   document.getElementById('cfgOverlay').classList.add('on');
 }
 function saveCfg(){
-  S.cfg.url=document.getElementById('cfgUrl').value.trim();
   const tok=document.getElementById('cfgHfToken').value.trim();
   if(tok) S.cfg.hfToken=tok;
-  // sessionStorage에 토큰 보관 (새로고침 복원)
+  const mdSel=document.getElementById('cfgImgModel');
+  if(mdSel) S.cfg.imgModel=mdSel.value;
+  // sessionStorage에 보관 (새로고침 복원)
   if(S.cfg.hfToken) sessionStorage.setItem('_hft', S.cfg.hfToken);
+  if(S.cfg.imgModel) sessionStorage.setItem('_him', S.cfg.imgModel);
   document.getElementById('cfgOverlay').classList.remove('on');
   showToast('설정이 저장됐습니다');
 }
